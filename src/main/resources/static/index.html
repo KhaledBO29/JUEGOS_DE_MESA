@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#020617">
+    <title>Juegos UCC · Ludoteca universitaria</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        :root { color-scheme: dark; }
+        body { font-family: "DM Sans", sans-serif; }
+        h1, h2, h3, .display { font-family: "Manrope", sans-serif; }
+        .glass { background: rgba(15, 23, 42, .76); backdrop-filter: blur(18px); }
+        .soft-grid { background-image: radial-gradient(rgba(52, 211, 153, .075) 1px, transparent 1px); background-size: 26px 26px; }
+        .switch:checked + span { background: #10b981; }
+        .switch:checked + span i { transform: translateX(1.15rem); }
+        .card-image { background: linear-gradient(135deg, rgba(6, 78, 59, .35), rgba(15, 23, 42, .1)); }
+        .toast-in { animation: toast-in .22s ease-out; }
+        @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100 soft-grid">
+<div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+    <div class="absolute -left-40 -top-40 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl"></div>
+    <div class="absolute -right-32 top-1/3 h-96 w-96 rounded-full bg-teal-500/10 blur-3xl"></div>
+</div>
+
+<header class="sticky top-0 z-40 border-b border-white/5 bg-slate-950/85 backdrop-blur-xl">
+    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-6">
+        <a href="/" class="flex items-center gap-3" aria-label="Juegos UCC, inicio">
+            <span class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-400 text-slate-950 shadow-lg shadow-emerald-950/40">
+                <i class="fa-solid fa-dice text-lg"></i>
+            </span>
+            <span>
+                <span class="block display text-sm font-extrabold tracking-wide text-white">JUEGOS <span class="text-emerald-400">UCC</span></span>
+                <span class="block text-[10px] font-semibold uppercase tracking-[.2em] text-slate-500">Ludoteca universitaria</span>
+            </span>
+        </a>
+        <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+            <label for="carnetInput" class="sr-only">Carnet universitario</label>
+            <div class="flex overflow-hidden rounded-xl border border-slate-700 bg-slate-900 focus-within:border-emerald-500">
+                <span class="grid w-11 place-items-center text-slate-500"><i class="fa-regular fa-id-card"></i></span>
+                <input id="carnetInput" class="min-w-0 bg-transparent py-2.5 pr-3 text-sm text-white outline-none placeholder:text-slate-600 sm:w-48"
+                       placeholder="Digita o escanea carnet" autocomplete="off">
+                <button id="validateCarnet" class="border-l border-slate-700 px-4 text-xs font-bold text-emerald-300 transition hover:bg-emerald-400/10">
+                    Validar
+                </button>
+            </div>
+            <button id="openRegistration" type="button" class="rounded-xl border border-slate-700 px-3 py-2.5 text-xs font-semibold text-slate-300 transition hover:border-emerald-500/50 hover:text-emerald-300">
+                <i class="fa-solid fa-user-plus mr-1.5"></i>Registrar usuario
+            </button>
+            <div id="identity" class="hidden items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs">
+                <span class="grid h-7 w-7 place-items-center rounded-full bg-emerald-400/15 text-emerald-300"><i class="fa-solid fa-user-check"></i></span>
+                <span><strong id="identityName" class="block text-emerald-100"></strong><span id="identityMeta" class="text-emerald-300/70"></span></span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
+    <section class="grid items-center gap-10 py-12 sm:py-16 lg:grid-cols-[1.15fr_.85fr] lg:py-20">
+        <div>
+            <span class="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/5 px-3 py-1.5 text-xs font-semibold text-emerald-300">
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span> Tu próxima partida empieza aquí
+            </span>
+            <h1 class="mt-5 max-w-2xl text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl">
+                Conecta ideas.<br><span class="text-emerald-400">Juega en equipo.</span>
+            </h1>
+            <p class="mt-5 max-w-xl text-base leading-7 text-slate-400 sm:text-lg">
+                Explora la ludoteca UCC, reserva tu clásico favorito y comparte una buena partida con tu comunidad.
+            </p>
+            <a href="#catalogo" class="mt-7 inline-flex items-center gap-2 rounded-xl bg-emerald-400 px-5 py-3 text-sm font-bold text-slate-950 shadow-lg shadow-emerald-950/30 transition hover:bg-emerald-300">
+                Explorar catálogo <i class="fa-solid fa-arrow-down-long text-xs"></i>
+            </a>
+        </div>
+        <div class="relative mx-auto w-full max-w-lg">
+            <div class="absolute -inset-4 rounded-[2rem] bg-emerald-400/10 blur-2xl"></div>
+            <div class="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950 p-6 shadow-2xl sm:p-8">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-[.18em] text-emerald-300">La ludoteca</span>
+                    <i class="fa-solid fa-shapes text-emerald-300/60"></i>
+                </div>
+                <div class="my-8 grid grid-cols-3 gap-3">
+                    <div class="grid aspect-square place-items-center rounded-2xl border border-white/10 bg-white/[.04] text-4xl text-emerald-300"><i class="fa-solid fa-chess-knight"></i></div>
+                    <div class="grid aspect-square place-items-center rounded-2xl border border-emerald-400/20 bg-emerald-400/10 text-4xl text-emerald-200"><i class="fa-solid fa-dice-d20"></i></div>
+                    <div class="grid aspect-square place-items-center rounded-2xl border border-white/10 bg-white/[.04] text-4xl text-teal-300"><i class="fa-solid fa-chess-rook"></i></div>
+                </div>
+                <div class="flex items-end justify-between gap-4">
+                    <div><p id="heroAvailable" class="display text-3xl font-extrabold text-white">—</p><p class="mt-1 text-sm text-slate-400">ejemplares disponibles</p></div>
+                    <div class="rounded-xl border border-white/10 bg-slate-950/50 px-3 py-2 text-right"><p id="heroGames" class="font-bold text-emerald-300">—</p><p class="text-[11px] text-slate-500">juegos en catálogo</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="catalogo" class="scroll-mt-24">
+        <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+            <div><p class="text-xs font-bold uppercase tracking-[.18em] text-emerald-400">Descubre tu siguiente favorito</p><h2 class="mt-2 text-2xl font-bold text-white sm:text-3xl">Clásicos para compartir</h2></div>
+            <span id="catalogStatus" class="text-sm text-slate-500">Cargando catálogo…</span>
+        </div>
+        <div class="mb-5 grid gap-3 sm:grid-cols-[1fr_220px_auto]">
+            <label class="flex items-center gap-3 rounded-xl border border-slate-700 bg-slate-900/80 px-3">
+                <i class="fa-solid fa-magnifying-glass text-slate-500"></i>
+                <input id="gameSearch" type="search" class="w-full bg-transparent py-3 text-sm text-white outline-none placeholder:text-slate-600" placeholder="Buscar por nombre o categoría">
+            </label>
+            <label class="sr-only" for="categoryFilter">Filtrar por categoría</label>
+            <select id="categoryFilter" class="rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 text-sm text-slate-300 outline-none focus:border-emerald-500">
+                <option value="">Todas las categorías</option>
+            </select>
+            <button id="clearFilters" type="button" class="rounded-xl border border-slate-700 px-4 py-3 text-sm font-semibold text-slate-300 transition hover:border-emerald-500/50 hover:text-emerald-300">
+                <i class="fa-solid fa-filter-circle-xmark mr-2"></i>Limpiar filtros
+            </button>
+        </div>
+        <div id="gameGrid" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4"></div>
+    </section>
+
+    <section class="mt-14 grid gap-5 lg:grid-cols-3">
+        <article class="glass rounded-2xl border border-white/[.08] p-5 sm:p-6">
+            <div class="mb-5 flex items-center gap-3">
+                <span class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-400/10 text-emerald-300"><i class="fa-solid fa-arrow-right-arrow-left"></i></span>
+                <div><h2 class="font-bold text-white">Préstamo / traspaso</h2><p class="text-xs text-slate-500">Entrega con trazabilidad</p></div>
+            </div>
+            <form id="loanForm" class="space-y-3">
+                <label class="block text-xs font-semibold text-slate-400" for="loanCopy">Ejemplar disponible</label>
+                <select id="loanCopy" required class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 text-sm text-slate-200 outline-none focus:border-emerald-500">
+                    <option value="">Selecciona un ejemplar</option>
+                </select>
+                <input id="loanNotes" maxlength="1000" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 text-sm outline-none placeholder:text-slate-600 focus:border-emerald-500" placeholder="Observaciones iniciales (opcional)">
+                <button class="w-full rounded-xl bg-emerald-400 px-4 py-3 text-sm font-bold text-slate-950 transition hover:bg-emerald-300"><i class="fa-solid fa-hand-holding-heart mr-2"></i>Registrar préstamo</button>
+            </form>
+            <div class="my-5 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[.15em] text-slate-600"><span class="h-px flex-1 bg-slate-800"></span> Apartar ejemplar <span class="h-px flex-1 bg-slate-800"></span></div>
+            <form id="reserveForm" class="space-y-3">
+                <select id="reserveCopy" required class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 text-sm text-slate-200 outline-none focus:border-emerald-500">
+                    <option value="">Ejemplar disponible para reserva</option>
+                </select>
+                <button class="w-full rounded-xl border border-teal-500/30 bg-teal-500/10 px-4 py-3 text-sm font-bold text-teal-300 transition hover:bg-teal-500/20"><i class="fa-regular fa-bookmark mr-2"></i>Apartar ejemplar</button>
+            </form>
+            <form id="cancelReservationForm" class="mt-3 flex gap-2">
+                <select id="activeReservation" class="min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-900 px-3 py-2.5 text-xs text-slate-300 outline-none focus:border-emerald-500">
+                    <option value="">Mis reservas activas</option>
+                </select>
+                <button aria-label="Cancelar reserva seleccionada" class="rounded-xl border border-slate-700 px-3 text-xs text-slate-400 transition hover:border-rose-500/40 hover:text-rose-300"><i class="fa-solid fa-xmark"></i></button>
+            </form>
+            <div class="my-5 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[.15em] text-slate-600"><span class="h-px flex-1 bg-slate-800"></span> Transferir posesión <span class="h-px flex-1 bg-slate-800"></span></div>
+            <form id="transferForm" class="space-y-3">
+                <select id="transferLoan" required class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 text-sm text-slate-200 outline-none focus:border-emerald-500">
+                    <option value="">Préstamo activo</option>
+                </select>
+                <input id="studentCarnet" required class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 text-sm outline-none placeholder:text-slate-600 focus:border-emerald-500" placeholder="Carnet del estudiante">
+                <button class="w-full rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm font-bold text-emerald-300 transition hover:bg-emerald-500/20"><i class="fa-solid fa-share mr-2"></i>Transferir al estudiante</button>
+            </form>
+            <p class="mt-3 text-[11px] leading-5 text-slate-500">El carnet validado en la cabecera debe corresponder al profesor responsable.</p>
+        </article>
+
+        <article class="glass rounded-2xl border border-white/[.08] p-5 sm:p-6 lg:col-span-2">
+            <div class="mb-5 flex items-center gap-3">
+                <span class="grid h-10 w-10 place-items-center rounded-xl bg-teal-400/10 text-teal-300"><i class="fa-solid fa-clipboard-check"></i></span>
+                <div><h2 class="font-bold text-white">Devolución &amp; check-in</h2><p class="text-xs text-slate-500">Revisa el estado físico del juego</p></div>
+            </div>
+            <form id="returnForm" class="space-y-4">
+                <label class="block text-xs font-semibold text-slate-400" for="returnLoan">Préstamo que vas a devolver</label>
+                <select id="returnLoan" required class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 text-sm text-slate-200 outline-none focus:border-emerald-500">
+                    <option value="">Selecciona un préstamo activo</option>
+                </select>
+                <div class="grid gap-3 sm:grid-cols-2">
+                    <label class="flex cursor-pointer items-center justify-between rounded-xl border border-slate-700 bg-slate-900/70 p-3.5">
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-puzzle-piece text-amber-300"></i><span><strong class="block text-sm text-slate-200">Piezas faltantes</strong><small class="text-xs text-slate-500">Reportar componentes incompletos</small></span></span>
+                        <input id="missingPieces" type="checkbox" class="switch sr-only"><span class="relative h-6 w-11 rounded-full bg-slate-700 transition"><i class="absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition-transform"></i></span>
+                    </label>
+                    <label class="flex cursor-pointer items-center justify-between rounded-xl border border-slate-700 bg-slate-900/70 p-3.5">
+                        <span class="flex items-center gap-3"><i class="fa-solid fa-triangle-exclamation text-rose-300"></i><span><strong class="block text-sm text-slate-200">Daños físicos</strong><small class="text-xs text-slate-500">Requiere revisión / mantenimiento</small></span></span>
+                        <input id="damaged" type="checkbox" class="switch sr-only"><span class="relative h-6 w-11 rounded-full bg-slate-700 transition"><i class="absolute left-1 top-1 h-4 w-4 rounded-full bg-white transition-transform"></i></span>
+                    </label>
+                </div>
+                <input id="returnNotes" maxlength="1000" class="w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 text-sm outline-none placeholder:text-slate-600 focus:border-emerald-500" placeholder="Detalle de piezas o daños (opcional)">
+                <button class="w-full rounded-xl bg-teal-400 px-4 py-3 text-sm font-bold text-slate-950 transition hover:bg-teal-300"><i class="fa-solid fa-check mr-2"></i>Confirmar devolución</button>
+            </form>
+            <p class="mt-3 text-[11px] leading-5 text-slate-500">Marca las incidencias del chequeo. Un daño envía el ejemplar a mantenimiento; piezas faltantes quedan registradas como novedad.</p>
+        </article>
+    </section>
+
+    <section class="mt-14">
+        <div class="mb-5 flex items-end justify-between gap-4">
+            <div><p class="text-xs font-bold uppercase tracking-[.18em] text-emerald-400">Seguimiento</p><h2 id="loansHeading" class="mt-2 text-2xl font-bold text-white">Préstamos activos</h2></div>
+            <div class="flex gap-2">
+                <button id="toggleLoanHistory" type="button" class="rounded-lg border border-slate-700 px-3 py-2 text-xs font-semibold text-slate-300 transition hover:border-emerald-500/50 hover:text-emerald-300"><i class="fa-solid fa-clock-rotate-left mr-1"></i>Ver historial</button>
+                <button id="refreshLoans" type="button" class="rounded-lg border border-slate-700 px-3 py-2 text-xs font-semibold text-slate-300 transition hover:border-emerald-500/50 hover:text-emerald-300"><i class="fa-solid fa-rotate mr-1"></i>Actualizar</button>
+            </div>
+        </div>
+        <div id="activeLoans" class="grid gap-3 md:grid-cols-2"></div>
+    </section>
+</main>
+
+<div id="detailsModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <article class="w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-2xl shadow-black/50">
+        <div class="flex items-start justify-between border-b border-white/5 p-5">
+            <div><p class="text-xs font-bold uppercase tracking-[.18em] text-emerald-400">Ficha del juego</p><h2 id="modalTitle" class="mt-1 text-xl font-bold text-white"></h2></div>
+            <button id="closeModal" type="button" aria-label="Cerrar detalles" class="grid h-9 w-9 place-items-center rounded-lg text-slate-400 transition hover:bg-white/5 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="modalContent" class="max-h-[65vh] overflow-y-auto p-5"></div>
+    </article>
+</div>
+<div id="registrationModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="registrationTitle">
+    <article class="w-full max-w-md rounded-2xl border border-white/10 bg-slate-900 p-5 shadow-2xl shadow-black/50">
+        <div class="mb-5 flex items-start justify-between">
+            <div><p class="text-xs font-bold uppercase tracking-[.18em] text-emerald-400">Comunidad UCC</p><h2 id="registrationTitle" class="mt-1 text-xl font-bold text-white">Registrar usuario</h2></div>
+            <button id="closeRegistration" type="button" aria-label="Cerrar registro" class="grid h-9 w-9 place-items-center rounded-lg text-slate-400 transition hover:bg-white/5 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <form id="registrationForm" class="space-y-3">
+            <input id="newCarnet" required maxlength="30" class="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm outline-none placeholder:text-slate-600 focus:border-emerald-500" placeholder="Carnet">
+            <input id="newName" required maxlength="120" class="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm outline-none placeholder:text-slate-600 focus:border-emerald-500" placeholder="Nombre completo">
+            <input id="newEmail" required type="email" maxlength="160" class="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm outline-none placeholder:text-slate-600 focus:border-emerald-500" placeholder="Correo institucional">
+            <select id="newRole" required class="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-slate-300 outline-none focus:border-emerald-500">
+                <option value="ESTUDIANTE">Estudiante</option><option value="PROFESOR">Profesor</option>
+            </select>
+            <button class="w-full rounded-xl bg-emerald-400 px-4 py-3 text-sm font-bold text-slate-950 transition hover:bg-emerald-300"><i class="fa-solid fa-user-plus mr-2"></i>Crear usuario</button>
+        </form>
+    </article>
+</div>
+<div id="toast" class="fixed bottom-5 right-5 z-50 hidden max-w-sm rounded-xl border px-4 py-3 text-sm shadow-2xl"></div>
+<footer class="border-t border-white/5 py-6 text-center text-xs text-slate-600">Universidad Cooperativa de Colombia <span class="mx-1 text-emerald-600">·</span> Ludoteca y préstamo de juegos</footer>
+
+<script>
+    const API = "/api";
+    const gameImages = {
+        Ajedrez: "/images/games/ajedrez.png",
+        Catan: "/images/games/catan.png",
+        Monopoly: "/images/games/monopoly.png",
+        Scrabble: "/images/games/scrabble.png",
+        "Ticket to Ride": "/images/games/ticket-to-ride.png",
+        Pandemic: "/images/games/pandemic.png",
+        Dixit: "/images/games/dixit.png",
+        UNO: "/images/games/uno.png",
+        Carcassonne: "/images/games/carcassonne.png",
+        Risk: "/images/games/risk.png",
+        Clue: "/images/games/clue.png",
+        Azul: "/images/games/azul.png"
+    };
+    const icons = {
+        Ajedrez: "fa-chess-knight", Catan: "fa-dice-d20", Monopoly: "fa-money-bill-transfer",
+        Scrabble: "fa-spell-check", "Ticket to Ride": "fa-train", Pandemic: "fa-kit-medical",
+        Dixit: "fa-wand-magic-sparkles", UNO: "fa-clone", Carcassonne: "fa-chess-rook",
+        Risk: "fa-earth-americas", Clue: "fa-magnifying-glass", Azul: "fa-palette"
+    };
+    let currentUser = null;
+    let games = [];
+    let visibleGames = [];
+    let activeLoans = [];
+    let allLoans = [];
+    let activeReservations = [];
+    let viewingLoanHistory = false;
+
+    const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, char =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
+
+    async function api(path, options = {}) {
+        const response = await fetch(`${API}${path}`, {
+            ...options,
+            headers: { "Content-Type": "application/json", ...(options.headers || {}) }
+        });
+        if (!response.ok) {
+            let message = `Error ${response.status}`;
+            try {
+                const body = await response.json();
+                message = body.detail || body.message || message;
+            } catch { /* La respuesta puede no incluir un cuerpo JSON. */ }
+            throw new Error(message);
+        }
+        return response.status === 204 ? null : response.json();
+    }
+
+    function notify(message, success = true) {
+        const toast = document.querySelector("#toast");
+        toast.className = `toast-in fixed bottom-5 right-5 z-50 max-w-sm rounded-xl border px-4 py-3 text-sm shadow-2xl ${success ? "border-emerald-500/30 bg-slate-900 text-emerald-100" : "border-rose-500/30 bg-slate-900 text-rose-100"}`;
+        toast.textContent = message;
+        window.clearTimeout(notify.timer);
+        notify.timer = window.setTimeout(() => toast.classList.add("hidden"), 4200);
+    }
+
+    function checkCurrentUser(role) {
+        if (!currentUser) throw new Error("Valida primero un carnet en la parte superior.");
+        if (role && currentUser.rol !== role) throw new Error(`Esta acción requiere un carnet de ${role.toLowerCase()}.`);
+        return currentUser;
+    }
+
+    async function validateCarnet() {
+        const carnet = document.querySelector("#carnetInput").value.trim();
+        if (!carnet) return notify("Digita o escanea un carnet para continuar.", false);
+        try {
+            currentUser = await api(`/usuarios/carnet/${encodeURIComponent(carnet)}`);
+            document.querySelector("#identityName").textContent = currentUser.nombre;
+            document.querySelector("#identityMeta").textContent = `${currentUser.rol} · ${currentUser.carnet}`;
+            document.querySelector("#identity").classList.remove("hidden");
+            document.querySelector("#identity").classList.add("flex");
+            renderLoans();
+            notify(`Carnet validado. Hola, ${currentUser.nombre}.`);
+        } catch (error) {
+            currentUser = null;
+            document.querySelector("#identity").classList.add("hidden");
+            notify(error.message, false);
+        }
+    }
+
+    function renderGames() {
+        const grid = document.querySelector("#gameGrid");
+        const query = document.querySelector("#gameSearch").value.trim().toLocaleLowerCase("es");
+        const category = document.querySelector("#categoryFilter").value;
+        visibleGames = games.filter(game => {
+            const matchesSearch = `${game.titulo} ${game.categoria}`.toLocaleLowerCase("es").includes(query);
+            return matchesSearch && (!category || game.categoria === category);
+        });
+        if (!visibleGames.length) {
+            grid.innerHTML = `<div class="rounded-2xl border border-dashed border-slate-700 p-10 text-center text-sm text-slate-400 sm:col-span-2 lg:col-span-4">
+                <i class="fa-solid fa-magnifying-glass mb-3 block text-xl text-slate-600"></i>No encontramos juegos con esos filtros.
+            </div>`;
+        } else grid.innerHTML = visibleGames.map(game => {
+            const disponibles = game.ejemplaresDisponibles;
+            const reservados = game.ejemplaresReservados;
+            const componentes = game.ejemplares?.[0]?.componentes || [];
+            const image = gameImages[game.titulo];
+            const components = componentes.slice(0, 3).map(item =>
+                `<span class="rounded-md border border-white/10 bg-slate-950/60 px-2 py-1 text-[10px] text-slate-300">${escapeHtml(item.cantidad)} ${escapeHtml(item.nombre)}</span>`
+            ).join("");
+            return `<article class="group overflow-hidden rounded-2xl border border-white/[.08] bg-slate-900/70 transition hover:-translate-y-1 hover:border-emerald-400/30 hover:shadow-xl hover:shadow-emerald-950/20">
+                <div class="card-image relative h-40 overflow-hidden">
+                    <img src="${image || ""}" alt="Juego de mesa ${escapeHtml(game.titulo)}" class="h-full w-full object-cover opacity-80 transition duration-500 group-hover:scale-105" loading="lazy"
+                         onerror="this.style.display='none';this.nextElementSibling.classList.remove('hidden')">
+                    <div class="hidden absolute inset-0 grid place-items-center bg-gradient-to-br from-emerald-950 to-slate-900 text-5xl text-emerald-300/80"><i class="fa-solid ${icons[game.titulo] || "fa-dice"}"></i></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+                    <span class="absolute left-3 top-3 rounded-full border border-white/10 bg-slate-950/75 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-200">${escapeHtml(game.categoria)}</span>
+                    <span class="absolute bottom-3 right-3 rounded-full ${disponibles > 0 ? "bg-emerald-400 text-slate-950" : reservados > 0 ? "bg-amber-300 text-slate-950" : "bg-rose-400 text-slate-950"} px-2.5 py-1 text-[10px] font-bold">${disponibles > 0 ? `${disponibles} disponible${disponibles === 1 ? "" : "s"}` : reservados > 0 ? "Apartado" : "No disponible"}</span>
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-bold text-white">${escapeHtml(game.titulo)}</h3>
+                    <div class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-slate-500">
+                        <span><i class="fa-solid fa-user-group mr-1 text-emerald-500"></i>${game.minJugadores}–${game.maxJugadores} jugadores</span>
+                        <span><i class="fa-regular fa-clock mr-1 text-emerald-500"></i>${game.duracionMinutos} min</span>
+                    </div>
+                    <div class="mt-3 flex flex-wrap gap-1.5">${components || '<span class="text-xs text-slate-500">Componentes por verificar</span>'}${componentes.length > 3 ? `<span class="rounded-md border border-white/10 px-2 py-1 text-[10px] text-slate-400">+${componentes.length - 3}</span>` : ""}</div>
+                    <div class="mt-4 grid grid-cols-2 gap-2">
+                        <button type="button" data-game-reserve="${game.id}" ${disponibles < 1 ? "disabled" : ""} class="rounded-lg ${disponibles > 0 ? "bg-emerald-400 text-slate-950 hover:bg-emerald-300" : "cursor-not-allowed bg-slate-800 text-slate-500"} px-2 py-2 text-xs font-bold transition">
+                            <i class="fa-regular fa-bookmark mr-1"></i>${disponibles > 0 ? "Reservar" : "No disponible"}
+                        </button>
+                        <button type="button" data-game-details="${game.id}" class="rounded-lg border border-slate-700 px-2 py-2 text-xs font-semibold text-slate-300 transition hover:border-emerald-500/40 hover:text-emerald-300">
+                            <i class="fa-regular fa-eye mr-1"></i>Ver detalles
+                        </button>
+                    </div>
+                </div>
+            </article>`;
+        }).join("");
+        document.querySelector("#catalogStatus").textContent = `${visibleGames.length} de ${games.length} juegos · ${games.reduce((sum, game) => sum + game.ejemplaresDisponibles, 0)} ejemplares disponibles`;
+        document.querySelector("#heroGames").textContent = games.length;
+        document.querySelector("#heroAvailable").textContent = games.reduce((sum, game) => sum + game.ejemplaresDisponibles, 0);
+        const categories = [...new Set(games.map(game => game.categoria))].sort((a, b) => a.localeCompare(b, "es"));
+        const categoryFilter = document.querySelector("#categoryFilter");
+        const selectedCategory = categoryFilter.value;
+        categoryFilter.innerHTML = `<option value="">Todas las categorías</option>${categories.map(item =>
+            `<option value="${escapeHtml(item)}">${escapeHtml(item)}</option>`
+        ).join("")}`;
+        categoryFilter.value = selectedCategory;
+        document.querySelector("#reserveCopy").innerHTML = `<option value="">Ejemplar disponible para reserva</option>${games.flatMap(game => game.ejemplares || []).filter(copy => copy.estado === "DISPONIBLE").map(copy =>
+            `<option value="${copy.codigoSerie}">${escapeHtml(copy.tituloJuego)} · ${escapeHtml(copy.codigoSerie)}</option>`
+        ).join("")}`;
+    }
+
+    function showModal(title, content) {
+        document.querySelector("#modalTitle").textContent = title;
+        document.querySelector("#modalContent").innerHTML = content;
+        const modal = document.querySelector("#detailsModal");
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        document.querySelector("#closeModal").focus();
+    }
+
+    function closeModal() {
+        const modal = document.querySelector("#detailsModal");
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+    }
+
+    function showGameDetails(gameId) {
+        const game = games.find(item => item.id === Number(gameId));
+        if (!game) return notify("No encontramos los detalles de este juego.", false);
+        const copies = (game.ejemplares || []).map(copy => `
+            <div class="rounded-xl border border-white/[.07] bg-slate-950/60 p-3">
+                <div class="flex items-center justify-between gap-3">
+                    <strong class="text-sm text-white">Serie ${escapeHtml(copy.codigoSerie)}</strong>
+                    <span class="rounded-full px-2 py-1 text-[10px] font-bold ${copy.estado === "DISPONIBLE" ? "bg-emerald-400/10 text-emerald-300" : "bg-amber-400/10 text-amber-200"}">${escapeHtml(copy.estado)}</span>
+                </div>
+                <ul class="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-slate-400">${copy.componentes.map(component =>
+                    `<li>${escapeHtml(component.nombre)} <span class="text-slate-500">× ${component.cantidad}</span></li>`
+                ).join("")}</ul>
+            </div>`).join("");
+        showModal(game.titulo, `<p class="mb-4 text-sm text-slate-400">${escapeHtml(game.categoria)} · ${game.minJugadores}–${game.maxJugadores} jugadores · ${game.duracionMinutos} minutos</p>
+            <h3 class="mb-2 text-xs font-bold uppercase tracking-wider text-emerald-300">Ejemplares y componentes</h3>
+            <div class="space-y-2">${copies || '<p class="text-sm text-slate-500">Sin ejemplares registrados.</p>'}</div>`);
+    }
+
+    async function showLoanHistory(loanId) {
+        try {
+            const loan = await api(`/prestamos/${loanId}`);
+            const history = (loan.historial || []).map(event => `
+                <li class="relative border-l border-emerald-500/30 pb-5 pl-5 last:border-transparent last:pb-0">
+                    <span class="absolute -left-[5px] top-1 h-2 w-2 rounded-full bg-emerald-400"></span>
+                    <strong class="block text-sm text-white">${escapeHtml(event.tipo.replaceAll("_", " "))}</strong>
+                    <span class="mt-1 block text-xs text-slate-400">${escapeHtml(event.detalle || "")}</span>
+                    <span class="mt-1 block text-[11px] text-slate-500">${escapeHtml(event.carnetActor)} · ${new Date(event.fecha).toLocaleString("es-CO")}</span>
+                </li>`).join("");
+            showModal(`Historial · ${loan.tituloJuego}`, `<p class="mb-4 text-xs text-slate-400">Responsable: ${escapeHtml(loan.profesorResponsable.nombre)} · Serie ${escapeHtml(loan.codigoSerie)}</p>
+                <ol class="ml-1">${history || '<li class="text-sm text-slate-500">Sin movimientos registrados.</li>'}</ol>`);
+        } catch (error) { notify(error.message, false); }
+    }
+
+    function renderLoans() {
+        const loanOptions = activeLoans.map(loan =>
+            `<option value="${loan.id}">${escapeHtml(loan.tituloJuego)} · ${escapeHtml(loan.codigoSerie)} · ${escapeHtml(loan.profesorResponsable.nombre)}</option>`
+        ).join("");
+        document.querySelector("#transferLoan").innerHTML = `<option value="">Préstamo activo</option>${loanOptions}`;
+        document.querySelector("#returnLoan").innerHTML = `<option value="">Selecciona un préstamo activo</option>${loanOptions}`;
+        document.querySelector("#activeReservation").innerHTML = `<option value="">Mis reservas activas</option>${activeReservations
+            .filter(reservation => currentUser && reservation.reservante.carnet === currentUser.carnet)
+            .map(reservation => `<option value="${reservation.id}">${escapeHtml(reservation.tituloJuego)} · ${escapeHtml(reservation.codigoSerie)} · vence ${new Date(reservation.fechaExpiracion).toLocaleString("es-CO")}</option>`)
+            .join("")}`;
+        const reservedCopyOptions = activeReservations.map(reservation =>
+            `<option value="${escapeHtml(reservation.codigoSerie)}" data-reserva-id="${reservation.id}">Reservado · ${escapeHtml(reservation.tituloJuego)} · ${escapeHtml(reservation.codigoSerie)} · ${escapeHtml(reservation.reservante.carnet)}</option>`
+        ).join("");
+        const availableCopyOptions = games.flatMap(game => game.ejemplares || [])
+            .filter(copy => copy.estado === "DISPONIBLE")
+            .map(copy => `<option value="${escapeHtml(copy.codigoSerie)}">${escapeHtml(copy.tituloJuego)} · ${escapeHtml(copy.codigoSerie)}</option>`)
+            .join("");
+        document.querySelector("#loanCopy").innerHTML = `<option value="">Selecciona un ejemplar o una reserva</option>${availableCopyOptions}${reservedCopyOptions}`;
+        const container = document.querySelector("#activeLoans");
+        const displayedLoans = viewingLoanHistory ? allLoans : activeLoans;
+        document.querySelector("#loansHeading").textContent = viewingLoanHistory ? "Historial de préstamos" : "Préstamos activos";
+        document.querySelector("#toggleLoanHistory").innerHTML = viewingLoanHistory
+            ? '<i class="fa-solid fa-arrow-left mr-1"></i>Ver activos'
+            : '<i class="fa-solid fa-clock-rotate-left mr-1"></i>Ver historial';
+        if (!displayedLoans.length) {
+            container.innerHTML = `<div class="rounded-xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500 md:col-span-2">${viewingLoanHistory ? "Todavía no hay préstamos registrados." : "No hay préstamos activos en este momento."}</div>`;
+            return;
+        }
+        container.innerHTML = displayedLoans.map(loan => `<article class="flex flex-wrap items-start justify-between gap-4 rounded-xl border border-white/[.08] bg-slate-900/60 p-4">
+            <div class="flex min-w-0 items-start gap-3">
+                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-400/10 text-emerald-300"><i class="fa-solid ${icons[loan.tituloJuego] || "fa-dice"}"></i></span>
+                <div class="min-w-0"><h3 class="truncate font-bold text-white">${escapeHtml(loan.tituloJuego)}</h3>
+                    <p class="mt-1 text-xs text-slate-400">Serie ${escapeHtml(loan.codigoSerie)} · Responsable: ${escapeHtml(loan.profesorResponsable.nombre)}</p>
+                    <p class="mt-1 text-xs text-slate-500">${loan.activo ? `Poseedor: ${escapeHtml(loan.estudiantePoseedorActual?.nombre || loan.profesorResponsable.nombre)}` : `Devolución: ${new Date(loan.fechaDevolucion).toLocaleDateString("es-CO")} · ${escapeHtml(loan.estadoEjemplar)}`} · ${new Date(loan.fechaPrestamo).toLocaleDateString("es-CO")}</p>
+                </div>
+            </div>
+            <div class="flex shrink-0 items-center gap-2">
+                <span class="rounded-full border ${loan.activo ? "border-amber-400/20 bg-amber-400/10 text-amber-200" : "border-slate-600 bg-slate-800 text-slate-300"} px-2.5 py-1 text-[10px] font-bold">${loan.activo ? "PRESTADO" : "DEVUELTO"}</span>
+                <button type="button" data-loan-history="${loan.id}" class="rounded-lg border border-slate-700 px-2.5 py-1.5 text-[10px] font-semibold text-slate-300 transition hover:border-emerald-500/40 hover:text-emerald-300">
+                    <i class="fa-solid fa-clock-rotate-left mr-1"></i>Historial
+                </button>
+            </div>
+        </article>`).join("");
+    }
+
+    async function createReservation(codigoSerie) {
+        const user = checkCurrentUser();
+        const reservation = await api("/reservas", {
+            method: "POST",
+            body: JSON.stringify({ codigoSerie, carnet: user.carnet })
+        });
+        notify(`Reserva creada. Vence el ${new Date(reservation.fechaExpiracion).toLocaleString("es-CO")}.`);
+        await refreshData();
+    }
+
+    async function refreshData() {
+        try {
+            [games, activeLoans, allLoans, activeReservations] = await Promise.all([
+                api("/juegos"),
+                api("/prestamos?activos=true"),
+                api("/prestamos?activos=false"),
+                api("/reservas?activas=true")
+            ]);
+            renderGames();
+            renderLoans();
+        } catch (error) {
+            document.querySelector("#catalogStatus").textContent = "No fue posible cargar los datos.";
+            notify(`${error.message}. Verifica que el servidor esté iniciado.`, false);
+        }
+    }
+
+    document.querySelector("#validateCarnet").addEventListener("click", validateCarnet);
+    document.querySelector("#carnetInput").addEventListener("input", event => {
+        if (currentUser && event.target.value.trim().toUpperCase() !== currentUser.carnet.toUpperCase()) {
+            currentUser = null;
+            document.querySelector("#identity").classList.add("hidden");
+            renderLoans();
+        }
+    });
+    document.querySelector("#carnetInput").addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            validateCarnet();
+        }
+    });
+    document.querySelector("#loanForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        try {
+            const professor = checkCurrentUser("PROFESOR");
+            const loan = await api("/prestamos", {
+                method: "POST",
+                body: JSON.stringify({
+                    codigoSerie: document.querySelector("#loanCopy").value,
+                    profesorCarnet: professor.carnet,
+                    reservaId: document.querySelector("#loanCopy").selectedOptions[0]?.dataset.reservaId || null,
+                    observaciones: document.querySelector("#loanNotes").value
+                })
+            });
+            event.target.reset();
+            notify(`Préstamo #${loan.id} registrado a nombre de ${professor.nombre}.`);
+            await refreshData();
+        } catch (error) { notify(error.message, false); }
+    });
+    document.querySelector("#reserveForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        try {
+            const codigoSerie = document.querySelector("#reserveCopy").value;
+            if (!codigoSerie) throw new Error("Selecciona el ejemplar que deseas reservar.");
+            await createReservation(codigoSerie);
+            event.target.reset();
+        } catch (error) { notify(error.message, false); }
+    });
+    document.querySelector("#gameGrid").addEventListener("click", async event => {
+        const reserveButton = event.target.closest("[data-game-reserve]");
+        const detailsButton = event.target.closest("[data-game-details]");
+        if (reserveButton) {
+            try {
+                const game = games.find(item => item.id === Number(reserveButton.dataset.gameReserve));
+                const copy = game?.ejemplares.find(item => item.estado === "DISPONIBLE");
+                if (!copy) throw new Error("No hay ejemplares disponibles de este juego.");
+                await createReservation(copy.codigoSerie);
+            } catch (error) { notify(error.message, false); }
+        } else if (detailsButton) {
+            showGameDetails(detailsButton.dataset.gameDetails);
+        }
+    });
+    document.querySelector("#gameSearch").addEventListener("input", renderGames);
+    document.querySelector("#categoryFilter").addEventListener("change", renderGames);
+    document.querySelector("#clearFilters").addEventListener("click", () => {
+        document.querySelector("#gameSearch").value = "";
+        document.querySelector("#categoryFilter").value = "";
+        renderGames();
+        notify("Filtros limpiados. Mostrando todo el catálogo.");
+    });
+    document.querySelector("#activeLoans").addEventListener("click", event => {
+        const historyButton = event.target.closest("[data-loan-history]");
+        if (historyButton) showLoanHistory(historyButton.dataset.loanHistory);
+    });
+    document.querySelector("#toggleLoanHistory").addEventListener("click", () => {
+        viewingLoanHistory = !viewingLoanHistory;
+        renderLoans();
+    });
+    document.querySelector("#closeModal").addEventListener("click", closeModal);
+    document.querySelector("#detailsModal").addEventListener("click", event => {
+        if (event.target.id === "detailsModal") closeModal();
+    });
+    document.querySelector("#openRegistration").addEventListener("click", () => {
+        const modal = document.querySelector("#registrationModal");
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        document.querySelector("#newCarnet").focus();
+    });
+    function closeRegistration() {
+        const modal = document.querySelector("#registrationModal");
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+    }
+    document.querySelector("#closeRegistration").addEventListener("click", closeRegistration);
+    document.querySelector("#registrationModal").addEventListener("click", event => {
+        if (event.target.id === "registrationModal") closeRegistration();
+    });
+    document.querySelector("#registrationForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        try {
+            const user = await api("/usuarios", {
+                method: "POST",
+                body: JSON.stringify({
+                    carnet: document.querySelector("#newCarnet").value.trim(),
+                    nombre: document.querySelector("#newName").value.trim(),
+                    email: document.querySelector("#newEmail").value.trim(),
+                    rol: document.querySelector("#newRole").value
+                })
+            });
+            event.target.reset();
+            closeRegistration();
+            document.querySelector("#carnetInput").value = user.carnet;
+            await validateCarnet();
+            notify(`Usuario ${user.nombre} registrado correctamente.`);
+        } catch (error) { notify(error.message, false); }
+    });
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+            closeModal();
+            closeRegistration();
+        }
+    });
+    document.querySelector("#cancelReservationForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        try {
+            const user = checkCurrentUser();
+            const reservationId = document.querySelector("#activeReservation").value;
+            if (!reservationId) throw new Error("Selecciona una reserva activa tuya.");
+            const result = await api(`/reservas/${reservationId}/cancelacion`, {
+                method: "POST",
+                body: JSON.stringify({ carnet: user.carnet })
+            });
+            notify(`Reserva ${result.estado.toLowerCase()}.`);
+            await refreshData();
+        } catch (error) { notify(error.message, false); }
+    });
+    document.querySelector("#transferForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        try {
+            const professor = checkCurrentUser("PROFESOR");
+            const loanId = document.querySelector("#transferLoan").value;
+            if (!loanId) throw new Error("Selecciona el préstamo que vas a transferir.");
+            const result = await api(`/prestamos/${loanId}/transferencias`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                    profesorCarnet: professor.carnet,
+                    estudianteCarnet: document.querySelector("#studentCarnet").value
+                })
+            });
+            event.target.reset();
+            notify(`Posesión transferida a ${result.estudiantePoseedorActual.nombre}.`);
+            await refreshData();
+        } catch (error) { notify(error.message, false); }
+    });
+    document.querySelector("#returnForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        try {
+            const actor = checkCurrentUser();
+            const loanId = document.querySelector("#returnLoan").value;
+            if (!loanId) throw new Error("Selecciona el préstamo que vas a devolver.");
+            const result = await api(`/prestamos/${loanId}/devolucion`, {
+                method: "POST",
+                body: JSON.stringify({
+                    carnetActor: actor.carnet,
+                    piezasFaltantes: document.querySelector("#missingPieces").checked,
+                    danos: document.querySelector("#damaged").checked,
+                    observaciones: document.querySelector("#returnNotes").value
+                })
+            });
+            event.target.reset();
+            notify(`Devolución registrada. Estado del ejemplar: ${result.estadoEjemplar}.`);
+            await refreshData();
+        } catch (error) { notify(error.message, false); }
+    });
+    document.querySelector("#refreshLoans").addEventListener("click", refreshData);
+    refreshData();
+</script>
+</body>
+</html>
